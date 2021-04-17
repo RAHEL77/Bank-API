@@ -7,6 +7,8 @@ app.use(bodyParser.json());
 let users;
 const loadUsers=()=>{
 fs.readFile("./notes-app/Homework/users.json",(err,data)=>{
+  // fs.readFileSync('./notes-app/Homework/users.json',(err,data)=>{
+
     if(err){
         console.log(err);
         return
@@ -113,43 +115,47 @@ app.put("/users/:id/deposit", (req, res) => {
 
 app.listen(process.env.PORT || 8080);
 
-// Node JS – Bank API
-// The following exercise contains the following subjects:
-//  express
-//  fs
-//  postman
+
 
 // Instructions:
 // We are going to build a bank API.
 // You are a manager of a big bank.
 // The manager has access to the users of the bank and can do
 // the following:
-// Add users
-// Can add users to the bank. Each user has the following:
-// passport id, cash(default 0), credit(default 0).
-// Depositing
-// Can deposit cash to a user. (by the users passport id and
-// amount of cash)
-// Update credit
-// Can update a users credit (only positive numbers)
-// Withdraw money
-// Can withdraw money from the user with cash (can withdraw
-// money until the cash and credit run out. Your cash can be in
-// minus up to the credit limit)
-// Transferring
-// Can transfer money from one user to another with cash(can
-// transfer money until the cash and credit run out. Your cash can
-// be in minus up to the credit limit)
-// Show details of user
-// Can fetch all details of a particular user
-// Show details of all users
-// Can fetch all details of all the users
-// Use cases:
+
+// ***Add users
+// -Can add users to the bank. Each user has the following:
+//      passport id, cash(default 0), credit(default 0).
+
+// ***Depositing-הפקדה
+// -Can deposit cash to a user. (by the users passport id and
+//       amount of cash)
+
+// ***Update credit
+// -Can update a users credit (only positive numbers)
+
+// ***Withdraw money
+// -Can withdraw money from the user with cash (can withdraw
+//      money until the cash and credit run out. Your cash can be in
+//      minus up to the credit limit)
+
+// ***Transferring
+// -Can transfer money from one user to another with cash(can
+//  transfer money until the cash and credit run out. Your cash can
+//  be in minus up to the credit limit)
+
+// ***Show details of user
+// -Can fetch all details of a particular user
+// -Show details of all users
+// -Can fetch all details of all the users
+
+// -Use cases:
 // 1. Cannot add duplicate users
 // 2. When fetching users, make sure they exist.
 // 3. Any other use cases?(hint: there are!)
 // If the use cases are not sufficient send an appropriate error
 //    message to the client.
+
 // • Save all data to a json file.
 // • Create express end points that handle the logic
 // • Test your work with postman
@@ -165,6 +171,13 @@ app.listen(process.env.PORT || 8080);
 // user.
 // 2. Fetch the users that are active and have a specified amount
 // of cash.
+
+// Node JS – Bank API
+// The following exercise contains the following subjects:
+//  express
+//  fs
+//  postman
+
 // Submitting instructions:
 
 // • Free text – a description of the assignment. Stuff

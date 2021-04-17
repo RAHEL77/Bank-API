@@ -4,6 +4,7 @@
   "description": "��#\u0000 \u0000B\u0000a\u0000n\u0000k\u0000-\u0000A\u0000P\u0000I\u0000\r\u0000 \u0000",
   "main": "Bank.js",
   "scripts": {
+    "start": "nodemon ./src/Bank.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/RAHEL77/Bank-API#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7"
   }
 }
