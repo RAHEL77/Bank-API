@@ -1,69 +1,73 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const fs=require("fs");
+const fs = require("fs");
 const app = express();
 app.use(bodyParser.json());
 
-let users;
-const loadUsers=()=>{
-fs.readFile("./notes-app/Homework/users.json",(err,data)=>{
-  // fs.readFileSync('./notes-app/Homework/users.json',(err,data)=>{
+let users; //holds an array of users objects
+const loadUsers = () => {
+  fs.readFile("./src/users.json", (err, data) => {
+    // fs.readFileSync('./src/users.json',(err,data)=>{
 
-    if(err){
-        console.log(err);
-        return
+    if (err) {
+      console.log(err);
+      return;
+    } else {
+      //all array from json file
+      // console.log(data);
+      // console.log(data.length);
+      users = JSON.parse(data);
     }
-    else{
-        users=JSON.parse(data)
-    }
-    
-})
-}
+  });
+};
 
-const saveUsers=(users)=>{
-    const jsonUsers=JSON.stringify(users)
-    fs.writeFile("./notes-app/Homework/users.json",jsonUsers,(err)=>{
-        if(err){
-            console.log(err);
-            return
-        }
-                
-    })
+const saveUsers = (users) => {
+  const jsonUsers = JSON.stringify(users);
+  fs.writeFile("./src/users.json", jsonUsers, (err) => {
+    if (err) {
+      console.log(err);
+      return;
     }
+  });
+};
 
 loadUsers();
 
-const findUser=(id)=>{
-    const user = users.find((u) => u.id === +id);
-   return user
-}
+const findUser = (id) => {
+  const user = users.find((u) => u.id === +id);
+  return user;
+};
 
+// ***Show all users
 app.get("/users", (req, res) => {
   res.json({ users });
 });
 
+// ***Show details of user
 app.get("/users/:id", (req, res) => {
   const { id } = req.params;
-  const user = findUser(id)
- // 2. When fetching users, make sure they exist.
+  // const id=req.params.id;
+  const user = findUser(id);
+  // 2. When fetching users, make sure they exist.
   if (user) {
     res.json({ user });
   } else {
     res.status(404);
-    res.send()
+    res.send();
   }
 });
 
+// Add users
 app.post("/users", (req, res) => {
-  console.log("***** received user user *****", req.body);
+  console.log("***** receive user *****", req.body);
   const { id } = req.body;
   /// 1. Cannot add duplicate users
-  const user = findUser(id)
-  if (user){
-      res.status(400).json({msg:'user already esist'})
-      return
+  const user = findUser(id);
+  if (user) {
+    res.status(400).json({ msg: "user already esist" });
+    return;
   }
-  const user2 = { id, cash: 0, credit: 0 };
+  const user2 = { id: +id, cash: 0, credit: 0 };
   users.push(user2);
   saveUsers(users);
   res.status(201).json(user2);
@@ -71,51 +75,81 @@ app.post("/users", (req, res) => {
   return;
 });
 
+// ***Update credit
+app.put("/users/:id/credit", (req, res) => {
+  const { id } = req.params;
+  const { credit } = req.credit;
+  const user = findUser(id);
+  if (!user) {
+    res.status(404).json({ msg: "user not found" });
+    return;
+  }
+  if (credit < 0) {
+    res.status(400).json({ msg: "credit must be positif" });
+    return;}
+
+    user.credit = credit;
+    updateUser(user);
+    res.json(user);
+    res.send();
+    return;
+});
+
+// ***Depositing
 app.put("/users/:id/deposit", (req, res) => {
-    console.log("***** update user deposit user *****", req.body);
-    const { id } = req.params;
-    const { cash } = req.body;
-    /// 1. Cannot add duplicate users
-    const user = findUser(id)
-    if (!user){
-        res.status(404).json({msg:'user not found'})
-        return
-    }
-    user.cash+=cash;
-    const tempUsers=users.filter(u=>u.id!=id)
-    tempUsers.push(user);
-    users=tempUsers;
-
-    saveUsers(users);
-    res.status(200).json(user);
-    res.send();
+  console.log("***** update user deposit user *****", req.body);
+  const { id } = req.params;
+  const { cash } = req.body;
+  /// 1. Cannot add duplicate users
+  const user = findUser(id);
+  if (!user) {
+    res.status(404).json({ msg: "user not found" });
     return;
-  });
-  
-  app.put("/users/:id/withdraw", (req, res) => {
-    console.log("***** update user deposit user *****", req.body);
-    const { id } = req.params;
-    const { cash } = req.body;
-    /// 1. Cannot add duplicate users
-    const user = findUser(id)
-    if (!user){
-        res.status(404).json({msg:'user not found'})
-        return
-    }
-    user.cash-=cash;
-    const tempUsers=users.filter(u=>u.id!=id)
-    tempUsers.push(user);
-    users=tempUsers;
+  }
+  user.cash += cash;
 
-    saveUsers(users);
-    res.status(200).json(user);
-    res.send();
+  updateUser(user);
+  res.status(200).json(user);
+  res.send();
+  return;
+});
+
+const updateUser = (user) => {
+  //מייצר מערך חדש ללא לקוח קיים
+  const tempUsers = users.filter((u) => u.id != user.id);
+  //מוסיף למערך שנעשה פילטר את הלקוח מעודכן
+  tempUsers.push(user);
+  users = tempUsers;
+  saveUsers(users);
+};
+
+// ***Withdraw money
+app.put("/users/:id/withdraw", (req, res) => {
+  console.log("***** update user withdraw user *****", req.body);
+  const { id } = req.params;
+  const { cash } = req.body;
+  /// 1. Cannot add duplicate users
+  const user = findUser(id);
+  if (!user) {
+    res.status(404).json({ msg: "user not found" });
     return;
-  });
+  }
+  if(cash<user.credit+user.cash){
+    res.status(400).json({ msg: "cash must be greater than cash+credit" });
+    return;
+  }
 
-app.listen(process.env.PORT || 8080);
+  user.cash -= cash;
+  updateUser(user);
+  res.status(200).json(user);
+  res.send();
+  return;
+});
 
+// ***Transferring
+//
 
+app.listen(8001);
 
 // Instructions:
 // We are going to build a bank API.
